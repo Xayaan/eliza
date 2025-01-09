@@ -25,13 +25,6 @@ export default {
     }
   },
 
-  // Schedule periodic tweets <reference index={0}>Technical Tasks</reference>
-  async onStart({ scheduler, actions }) {
-    scheduler.schedule('*/30 * * * *', async () => {
-      await actions.execute('pubmed.postResearch');
-    });
-  },
-
   actions: [
     {
       name: 'pubmed.postResearch',
