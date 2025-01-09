@@ -26,3 +26,12 @@ export interface PubMedCache {
   set(key: string, value: PubMedArticle[]): void;
   clear(): void;
 }
+
+export interface PubMedActionResponse {
+  success: boolean;
+  data?: {
+    articles: PubMedArticle[];
+    tweetId?: string;
+  };
+  error?: string;
+}
