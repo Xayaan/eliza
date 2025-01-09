@@ -8,6 +8,23 @@ export default {
   version: '1.0.0',
   dependencies: ['@elizajs/twitter-client'],
 
+  // Add this event handler
+  async onStart({ scheduler, actions }) {
+    scheduler.schedule('*/30 * * * *', async () => {
+      await actions.execute('pubmed.postResearch');
+    });
+  },
+
+  // Add this message handler
+  async onMessage(message, { actions }) {
+    if (message.type === 'mention' || message.type === 'direct') {
+      await actions.execute('pubmed.searchAndReply', {
+        query: message.text,
+        replyToId: message.type === 'mention' ? message.id : undefined
+      });
+    }
+  },
+
   // Schedule periodic tweets <reference index={0}>Technical Tasks</reference>
   async onStart({ scheduler, actions }) {
     scheduler.schedule('*/30 * * * *', async () => {
