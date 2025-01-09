@@ -62,3 +62,43 @@ function formatArticles(data: any): PubMedArticle[] {
       url: `https://pubmed.ncbi.nlm.nih.gov/${article.uid}/`
     }));
 }
+
+import { ActionHandler } from '@elizaos/core';
+import { searchPubMed } from './pubmed';
+
+export const PubMedAction: ActionHandler = {
+  name: 'PUBMED_SEARCH',
+  description: 'Search PubMed for medical research articles',
+  parameters: {
+    query: {
+      type: 'string',
+      required: true,
+      description: 'Search query for PubMed articles'
+    },
+    maxResults: {
+      type: 'number',
+      required: false,
+      default: 5,
+      description: 'Maximum number of results to return'
+    }
+  },
+
+  async execute(context) {
+    const { query, maxResults = 5 } = context.input;
+
+    try {
+      const results = await searchPubMed(query, maxResults);
+      return {
+        success: true,
+        data: results
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `PubMed search failed: ${error.message}`
+      };
+    }
+  }
+};
+
+export default PubMedAction;
