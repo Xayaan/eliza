@@ -2,6 +2,57 @@
 import { TwitterClient } from '@elizaos/twitter-client';
 import { searchPubMed } from './utils/pubmed';
 import { formatTweet } from './utils/formatter';
+import { ActionPlugin } from '@elizaos/core';
+
+const pubmedAction: ActionPlugin = {
+  name: 'pubmed',
+  description: 'Search PubMed articles and return relevant medical research',
+  execute: async (params: { query: string }, config: any) => {
+    try {
+      const baseUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
+      const searchUrl = `${baseUrl}/esearch.fcgi?db=pubmed&term=${encodeURIComponent(params.query)}&retmode=json&retmax=5`;
+      
+      const response = await fetch(searchUrl);
+      const data = await response.json();
+      
+      if (!data.esearchresult || !data.esearchresult.idlist) {
+        return {
+          success: false,
+          message: 'No results found'
+        };
+      }
+
+      const ids = data.esearchresult.idlist;
+      const summaryUrl = `${baseUrl}/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json`;
+      
+      const summaryResponse = await fetch(summaryUrl);
+      const summaryData = await summaryResponse.json();
+
+      const articles = ids.map(id => {
+        const article = summaryData.result[id];
+        return {
+          title: article.title,
+          authors: article.authors.map((author: any) => author.name).join(', '),
+          pubDate: article.pubdate,
+          doi: article.elocationid || 'No DOI available',
+          link: `https://pubmed.ncbi.nlm.nih.gov/${id}`
+        };
+      });
+
+      return {
+        success: true,
+        data: articles
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Error searching PubMed: ${error.message}`
+      };
+    }
+  }
+};
+
+export default pubmedAction;
 
 export default {
   name: 'pubmed',
