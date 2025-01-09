@@ -1,3 +1,7 @@
 actions:
   pubmed:
     enabled: true
+    config:
+      searchTerms: ["AI in medicine", "machine learning healthcare"]
+      tweetInterval: 3600000  # 1 hour in milliseconds
+      tweetTemplate: "New Research: {title}\n\nRead more: {url}"
