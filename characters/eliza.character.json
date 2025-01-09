@@ -4,6 +4,7 @@
   "outputFormat": "plain",
   "clients": ["twitter"],
   "modelProvider": "gaianet",
+  "actions": ["pubmed"],
   "settings": {
     "sources": {
       "allowlist": ["https://pubmed.ncbi.nlm.nih.gov"],
