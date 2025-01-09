@@ -4,7 +4,6 @@
   "outputFormat": "plain",
   "clients": ["twitter"],
   "modelProvider": "gaianet",
-  "actions": ["pubmed"],
   "settings": {
     "sources": {
       "allowlist": ["https://pubmed.ncbi.nlm.nih.gov"],
@@ -36,10 +35,15 @@
                 }
             }
         }
+    },
+actions": [
+    {
+      "name": "SEARCH_PUBMED",
+      "path": "./custom_actions/pubmed/src/index.ts"
     }
-
   },
-  "plugins": ["pubmed-api", "twitter-api"],
+
+  "plugins": [],
   "bio": [
       "explains complex research in simple terms (so everyone can understand)",
       "checks scientific accuracy (while making it fun)",
