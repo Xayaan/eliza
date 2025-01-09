@@ -1,9 +1,67 @@
 import { Action, IAgentRuntime, Memory, State, elizaLogger, generateObject, ModelClass, stringToUuid, getEmbeddingZeroVector } from "@elizaos/core";
-import { searchPubMed } from "./utils/search";
-import { pubmedTweetTemplate } from "./templates";
-import { PubMedArticle, PubMedTweetSchema } from "./types";
-import { rateLimiter } from "./utils/rateLimiter";
-import { formatCitation } from "./utils/format";
+import { PubMedAPI } from './utils/api';
+import { PubMedMemoryCache } from './utils/cache';
+import { validateConfig, DEFAULT_CONFIG } from './config';
+import { PubMedConfig, PubMedResponse, PubMedSearchParams } from './types';
+import { PubmedError, PubmedErrorCodes } from './errors';
+
+export class PubMedClient {
+  private api: PubMedAPI;
+  private cache: PubMedMemoryCache;
+  private config: PubMedConfig;
+
+  constructor(config: Partial<PubMedConfig>) {
+    this.config = validateConfig({ ...DEFAULT_CONFIG, ...config });
+    this.api = new PubMedAPI(this.config.api_key);
+    this.cache = new PubMedMemoryCache(this.config.cache_duration);
+  }
+
+  async search(params: PubMedSearchParams): Promise<PubMedResponse> {
+    try {
+      const cacheKey = this.getCacheKey(params);
+      const cachedResults = this.cache.get(cacheKey);
+      
+      if (cachedResults) {
+        return {
+          success: true,
+          data: cachedResults
+        };
+      }
+
+      const results = await this.api.search({
+        ...params,
+        max_results: Math.min(params.max_results || this.config.max_results, this.config.max_results)
+      });
+
+      this.cache.set(cacheKey, results);
+
+      return {
+        success: true,
+        data: results
+      };
+    } catch (error) {
+      if (error instanceof PubmedError) {
+        return {
+          success: false,
+          error: error.message
+        };
+      }
+      
+      return {
+        success: false,
+        error: 'An unexpected error occurred'
+      };
+    }
+  }
+
+  clearCache(): void {
+    this.cache.clear();
+  }
+
+  private getCacheKey(params: PubMedSearchParams): string {
+    return JSON.stringify(params);
+  }
+}
 
 function truncateToCompleteSentence(text: string, maxLength: number = 180): string {
     if (text.length <= maxLength) return text;
