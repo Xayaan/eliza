@@ -10,3 +10,12 @@ export const Config = z.object({
 });
 
 export type ConfigType = z.infer<typeof Config>;
+
+export function validateConfig(config: PubMedConfig): void {
+  if (!config.searchTerms || !Array.isArray(config.searchTerms)) {
+    throw new Error('Invalid searchTerms configuration');
+  }
+  if (!config.tweetTemplate) {
+    throw new Error('Missing tweet template configuration');
+  }
+}
