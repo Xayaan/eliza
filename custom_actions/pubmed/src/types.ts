@@ -1,18 +1,28 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { PubmedConfigSchema, PubmedSearchParamsSchema } from './schema';
+
+export type PubMedConfig = z.infer<typeof PubmedConfigSchema>;
+export type PubMedSearchParams = z.infer<typeof PubmedSearchParamsSchema>;
 
 export interface PubMedArticle {
-    title: string;
-    abstract: string;
-    url: string;
-    pmid: string;
-    journal?: string;
-    year?: string;
-    authors?: string[];
+  id: string;
+  title: string;
+  abstract: string;
+  authors: string[];
+  publicationDate: string;
+  journal: string;
+  doi?: string;
+  url: string;
 }
 
-export const PubMedTweetSchema = z.object({
-    text: z.string().describe("The text of the tweet"),
-    citation: z.string().describe("The citation information")
-});
+export interface PubMedResponse {
+  success: boolean;
+  data?: PubMedArticle[];
+  error?: string;
+}
 
-export type PubMedTweet = z.infer<typeof PubMedTweetSchema>;
+export interface PubMedCache {
+  get(key: string): PubMedArticle[] | null;
+  set(key: string, value: PubMedArticle[]): void;
+  clear(): void;
+}
