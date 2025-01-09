@@ -1,17 +1,12 @@
-import { PubMedConfig } from './types';
-import { PubmedConfigSchema } from './schema';
+// src/config.ts
+import { z } from 'zod';
 
-export function validateConfig(config: Partial<PubMedConfig>): PubMedConfig {
-  const result = PubmedConfigSchema.safeParse(config);
-  
-  if (!result.success) {
-    throw new Error(`Invalid PubMed configuration: ${result.error.message}`);
-  }
-  
-  return result.data;
-}
+export const Config = z.object({
+  pubmed: z.object({
+    apiKey: z.string().optional(),
+    searchInterval: z.number().default(30), // minutes
+    maxResults: z.number().default(5)
+  })
+});
 
-export const DEFAULT_CONFIG: Partial<PubMedConfig> = {
-  max_results: 10,
-  cache_duration: 3600
-};
+export type ConfigType = z.infer<typeof Config>;
