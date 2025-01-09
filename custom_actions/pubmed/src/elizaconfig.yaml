@@ -5,3 +5,8 @@ actions:
       searchTerms: ["AI in medicine", "machine learning healthcare"]
       tweetInterval: 3600000  # 1 hour in milliseconds
       tweetTemplate: "New Research: {title}\n\nRead more: {url}"
+      twitter:
+        enabled: true
+        autoReply: true
+        threadEnabled: true
+        citationFormat: "short" # or "full"
