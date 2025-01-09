@@ -19,16 +19,7 @@ export interface PubMedActionOutput extends ActionResponse {
     publishDate: string;
   }>;
 }
-export interface PubMedArticle {
-  id: string;
-  title: string;
-  abstract: string;
-  authors: string[];
-  publicationDate: string;
-  journal: string;
-  doi?: string;
-  url: string;
-}
+
 
 export interface PubMedResponse {
   success: boolean;
@@ -49,4 +40,21 @@ export interface PubMedActionResponse {
     tweetId?: string;
   };
   error?: string;
+}
+
+export interface PubMedArticle {
+  id: string;
+  title: string;
+  authors: string[];
+  abstract: string;
+  journal: string;
+  publicationDate: string;
+  doi?: string;
+  url: string;
+}
+
+export interface PubMedSearchResponse {
+  articles: PubMedArticle[];
+  total: number;
+  query: string;
 }
